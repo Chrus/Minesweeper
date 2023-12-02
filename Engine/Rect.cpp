@@ -24,6 +24,34 @@ Rect::Rect(const int left, const int right, const int top, const int bottom)
 	assert(bottom <= Graphics::ScreenHeight);
 }
 
+/// <summary>
+/// 
+/// </summary>
+/// <returns>Returns the top left corner of the rect</returns>
+Vector2& Rect::getPosition() const
+{
+	return Vector2(left, top);
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <returns>Returns the center of the rect</returns>
+Vector2& Rect::getCenter() const
+{
+	Vector2 temp = getSize();
+	return Vector2(left + temp.x / 2, top + temp.y / 2);
+}
+
+/// <summary>
+/// Returns the width and height of the Rect
+/// </summary>
+/// <returns>Vector2.x == width, Vector2.y == height</returns>
+Vector2& Rect::getSize() const
+{
+	return Vector2(right - left, bottom - top);
+}
+
 bool Rect::contains(const Vector2& point) const
 {
 	return point.x >= left && point.x <= right
