@@ -17,17 +17,17 @@ public:
 	Tile() = default;
 	Tile(const Rect& rect);
 	Tile(const Vector2& topLeft, const int width, const int height);
-	void init(const bool isMine, const int neightborMineCount);
 
 	Vector2& getPosition() const;
 	void clickTile(const Keyboard::Event& event);
 	void draw(Graphics& gfx) const;
 
-private:
-	Rect rect;
-	bool initialized = false;
-
 	bool isMine = false;
 	int neightborMineCount = 0;
+	Vector2 arrayPosition;
+
+private:
+	Rect rect;
+
 	TILE_STATE state = HIDDEN;
 };

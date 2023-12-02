@@ -15,7 +15,6 @@ public:
 	bool contains(const Vector2& point) const;
 	bool overlaps(const Rect& otherRect) const;
 
-private:
 	int left;
 	int right;
 	int top;
