@@ -42,6 +42,7 @@ void Game::UpdateModel()
 		field.resetGame();
 
 	field.update(wnd);
+	field.checkForVictory();
 }
 
 void Game::ComposeFrame()

@@ -24,6 +24,7 @@ public:
 
 	int tileCount() const;
 	Tile& getTile(Vector2& position);
+	bool checkForVictory();
 	Vector2& addOffset(Vector2& oldPosition) const;
 	void resetGame();
 	void update(MainWindow& wnd);

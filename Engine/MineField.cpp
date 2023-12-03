@@ -114,6 +114,20 @@ void MineField::resetGame()
 	initiliazed = true;
 }
 
+bool MineField::checkForVictory()
+{
+	for (Tile& tile : tiles)
+	{
+		if (tile.state == Tile::TILE_STATE::HIDDEN)
+			return false;
+		if (tile.state == Tile::TILE_STATE::FLAGGED && !tile.isMine)
+			return false;
+	}
+
+	state = GAME_STATE::VICTORY;
+	return true;
+}
+
 void MineField::update(MainWindow& wnd)
 {
 	assert(initiliazed);
@@ -161,6 +175,6 @@ void MineField::draw(Graphics& gfx) const
 			tile.draw(false, gfx);
 	}
 
-	//if (state == GAME_STATE::DEFEAT)
-	//	SpriteCodex::DrawWin(Vector2(150, numTileRows * SpriteCodex::tileSize + 100), gfx);
+	if (state == GAME_STATE::VICTORY)
+		SpriteCodex::DrawWin(Vector2(150, numTileRows * SpriteCodex::tileSize + 100), gfx);
 }
