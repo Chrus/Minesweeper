@@ -38,6 +38,13 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	field.update(wnd);
+
+	if (wnd.kbd.KeyIsPressed(VK_SPACE))
+	{
+		field.resetGame();
+		return;
+	}
 }
 
 void Game::ComposeFrame()

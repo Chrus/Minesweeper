@@ -85,9 +85,52 @@ Tile& MineField::getTile(Vector2& position)
 	return tiles[position.y * numTileColumns + position.x];
 }
 
-void MineField::update()
+void MineField::resetGame()
+{
+	initiliazed = false;
+
+	for (Tile& tile : tiles)
+	{
+		tile.isMine = false;
+		tile.neightborMineCount = 0;
+		tile.state = Tile::TILE_STATE::HIDDEN;
+	}
+
+	setBombLocations();
+	setTileBombCount();
+	state = GAME_STATE::PLAYING;
+
+	initiliazed = true;
+}
+
+void MineField::update(MainWindow& wnd)
 {
 	assert(initiliazed);
+
+	//Ignore mouse events if game is over
+	if (state != GAME_STATE::PLAYING)
+		return;
+
+	//process mouse events
+	while (!wnd.mouse.IsEmpty())
+	{
+		const Mouse::Event e = wnd.mouse.Read();
+		Vector2 pos = Vector2(e.GetPosX() / SpriteCodex::tileSize,
+			e.GetPosY() / SpriteCodex::tileSize);
+
+		//ignore anything outside playing area
+		if (pos.x < 0 || pos.x > numTileColumns
+			|| pos.y < 0 || pos.y > numTileRows)
+			return;
+
+		if (e.GetType() == Mouse::Event::Type::RPress)
+			tiles[pos.y * numTileColumns + pos.x].clickTile(Mouse::Event::Type::RPress);
+		else if (e.GetType() == Mouse::Event::Type::LPress)
+		{
+			if (tiles[pos.y * numTileColumns + pos.x].clickTile(Mouse::Event::Type::LPress))
+				state = GAME_STATE::DEFEAT;
+		}
+	}
 }
 
 void MineField::draw(Graphics& gfx) const
@@ -96,10 +139,16 @@ void MineField::draw(Graphics& gfx) const
 
 	gfx.DrawRect(0, 0, 
 		SpriteCodex::tileSize * numTileColumns, SpriteCodex::tileSize * numTileRows,
-		Colors::Gray);
+		SpriteCodex::baseColor);
 
 	for (const Tile& tile : tiles)
 	{
-		tile.draw(gfx);
+		if (state == GAME_STATE::DEFEAT)
+			tile.draw(true, gfx);
+		else
+			tile.draw(false, gfx);
 	}
+
+	//if (state == GAME_STATE::DEFEAT)
+	//	SpriteCodex::DrawWin(Vector2(150, numTileRows * SpriteCodex::tileSize + 100), gfx);
 }

@@ -2,10 +2,18 @@
 #include "Vector2.h"
 #include "Tile.h"
 #include "Graphics.h"
+#include "MainWindow.h"
 
 class MineField
 {
 public:
+	enum GAME_STATE
+	{
+		PLAYING,
+		VICTORY,
+		DEFEAT
+	};
+
 	MineField();
 	void setBombLocations();
 	void setTileBombCount();
@@ -16,13 +24,17 @@ public:
 
 	int tileCount() const;
 	Tile& getTile(Vector2& position);
-	void update();
+	void resetGame();
+	void update(MainWindow& wnd);
 	void draw(Graphics& gfx) const;
 
 private:
 	bool initiliazed = false;
 
 	Tile tiles[numTileColumns * numTileRows];
+	GAME_STATE state = GAME_STATE::PLAYING;
+	
+	//currently unused
 	Vector2 offset = Vector2(0, 0);
 };
 
