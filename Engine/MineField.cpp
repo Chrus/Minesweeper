@@ -8,13 +8,18 @@ MineField::MineField()
 {
 	assert(!initiliazed);
 
+	//calculate offset value to add to all calculations to center the playing field
+	offset.x += ((Graphics::ScreenWidth - numTileColumns * SpriteCodex::tileSize) / 2);
+	offset.y += ((Graphics::ScreenHeight - numTileRows * SpriteCodex::tileSize) / 2);
+
 	//set tile positions
 	for (int x = 0; x < numTileColumns; x++)
 	{
 		for (int y = 0; y < numTileRows; y++)
 		{
-			tiles[y * numTileColumns + x] = Tile(Vector2(x * SpriteCodex::tileSize, y * SpriteCodex::tileSize),
-				SpriteCodex::tileSize, SpriteCodex::tileSize);
+			Vector2& tilePosition = addOffset(Vector2(x * SpriteCodex::tileSize, y * SpriteCodex::tileSize));
+
+			tiles[y * numTileColumns + x] = Tile(tilePosition, SpriteCodex::tileSize, SpriteCodex::tileSize);
 			tiles[y * numTileColumns + x].arrayPosition = Vector2(x, y);
 		}
 	}
@@ -81,8 +86,14 @@ int MineField::tileCount() const
 
 Tile& MineField::getTile(Vector2& position)
 {
+	position -= offset;
 	position /= SpriteCodex::tileSize;
 	return tiles[position.y * numTileColumns + position.x];
+}
+
+Vector2& MineField::addOffset(Vector2& oldPosition) const
+{
+	return oldPosition += offset;
 }
 
 void MineField::resetGame()
@@ -107,27 +118,27 @@ void MineField::update(MainWindow& wnd)
 {
 	assert(initiliazed);
 
-	//Ignore mouse events if game is over
-	if (state != GAME_STATE::PLAYING)
-		return;
-
 	//process mouse events
 	while (!wnd.mouse.IsEmpty())
 	{
 		const Mouse::Event e = wnd.mouse.Read();
-		Vector2 pos = Vector2(e.GetPosX() / SpriteCodex::tileSize,
-			e.GetPosY() / SpriteCodex::tileSize);
 
-		//ignore anything outside playing area
-		if (pos.x < 0 || pos.x > numTileColumns
-			|| pos.y < 0 || pos.y > numTileRows)
-			return;
+		//Ignore mouse events if game is over
+		//But still process the Read()s or else bugs happen for some reason
+		if (state != GAME_STATE::PLAYING)
+			continue;
 
+		//ignore anything outside play area
+		Rect playArea = Rect(offset, numTileColumns * SpriteCodex::tileSize, numTileRows * SpriteCodex::tileSize);
+		if (!playArea.contains(Vector2(e.GetPosX(), e.GetPosY())))
+			continue;
+
+		Tile& clickedTile = getTile(Vector2(e.GetPosX(), e.GetPosY()));
 		if (e.GetType() == Mouse::Event::Type::RPress)
-			tiles[pos.y * numTileColumns + pos.x].clickTile(Mouse::Event::Type::RPress);
+			clickedTile.clickTile(Mouse::Event::Type::RPress);
 		else if (e.GetType() == Mouse::Event::Type::LPress)
 		{
-			if (tiles[pos.y * numTileColumns + pos.x].clickTile(Mouse::Event::Type::LPress))
+			if (clickedTile.clickTile(Mouse::Event::Type::LPress))
 				state = GAME_STATE::DEFEAT;
 		}
 	}
@@ -137,8 +148,9 @@ void MineField::draw(Graphics& gfx) const
 {
 	assert(initiliazed);
 
-	gfx.DrawRect(0, 0, 
-		SpriteCodex::tileSize * numTileColumns, SpriteCodex::tileSize * numTileRows,
+	gfx.DrawRect(offset.x, offset.y, 
+		SpriteCodex::tileSize * numTileColumns + offset.x,
+		SpriteCodex::tileSize * numTileRows + offset.y,
 		SpriteCodex::baseColor);
 
 	for (const Tile& tile : tiles)

@@ -24,6 +24,7 @@ public:
 
 	int tileCount() const;
 	Tile& getTile(Vector2& position);
+	Vector2& addOffset(Vector2& oldPosition) const;
 	void resetGame();
 	void update(MainWindow& wnd);
 	void draw(Graphics& gfx) const;
@@ -33,8 +34,6 @@ private:
 
 	Tile tiles[numTileColumns * numTileRows];
 	GAME_STATE state = GAME_STATE::PLAYING;
-	
-	//currently unused
 	Vector2 offset = Vector2(0, 0);
 };
 
