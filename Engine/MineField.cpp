@@ -154,6 +154,8 @@ void MineField::update(MainWindow& wnd)
 		{
 			if (clickedTile.clickTile(Mouse::Event::Type::LPress))
 				state = GAME_STATE::DEFEAT;
+			else
+				revealNeighbors(clickedTile);
 		}
 	}
 }
@@ -177,4 +179,28 @@ void MineField::draw(Graphics& gfx) const
 
 	if (state == GAME_STATE::VICTORY)
 		SpriteCodex::DrawWin(Vector2(150, numTileRows * SpriteCodex::tileSize + 100), gfx);
+}
+
+void MineField::revealNeighbors(Tile& tile)
+{
+	if (tile.isMine)
+		return;
+	tile.state = Tile::TILE_STATE::REVEALED;
+	if (tile.neightborMineCount != 0)
+		return;
+
+	for (int x = std::max(0, tile.arrayPosition.x - 1);
+		x <= std::min(numTileColumns - 1, tile.arrayPosition.x + 1);
+		x++)
+	{
+		for (int y = std::max(0, tile.arrayPosition.y - 1);
+			y <= std::min(numTileRows - 1, tile.arrayPosition.y + 1);
+			y++)
+		{
+			if (tiles[y * numTileColumns + x].state == Tile::TILE_STATE::REVEALED)
+				continue;
+
+			revealNeighbors(tiles[y * numTileColumns + x]);
+		}
+	}
 }

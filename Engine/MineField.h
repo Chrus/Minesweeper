@@ -20,7 +20,7 @@ public:
 
 	static constexpr int numTileColumns = 45;
 	static constexpr int numTileRows = 25;
-	static constexpr int numBombs = 250;
+	static constexpr int numBombs = 100;
 
 	int tileCount() const;
 	Tile& getTile(Vector2& position);
@@ -29,6 +29,7 @@ public:
 	void resetGame();
 	void update(MainWindow& wnd);
 	void draw(Graphics& gfx) const;
+	void revealNeighbors(Tile& tile);
 
 private:
 	bool initiliazed = false;
